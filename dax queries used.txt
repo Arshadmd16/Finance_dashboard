@@ -1,0 +1,85 @@
+================================
+  Dax used for preparing the dashboard
+================================
+
+## Making a table name Line selection for randomly changing the title name dynamically(as per our selection)
+
+  line selection = DATATABLE("Type", STRING, "No", INTEGER, {{"Savings", 1},{"Expenses", 2}, {"Target", 3}})
+
+-----------------------------------
+
+##  dynamic title
+    dynamic title = var title_change = SELECTEDVALUE('line selection'[No])
+    RETURN SWITCH(title_change, 1, "Expense by date", 2, "Savings by date", 3, "Target by Date")
+
+------------------------------------
+
+## measure name as Expense
+
+   Expense = DIVIDE([Total expense], [Total Income],0)
+------------------------------------
+
+## Line selection measure, which changes the Area chart on dynamically on clicking the target such as Expense, savings, or Target
+
+   line selection = VAR select_value = SELECTEDVALUE('line selection'[No])
+
+   return SWITCH(select_value, 1,[Expense], 2, [savings], 3, [Target])
+------------------------------------
+
+## To calculate monthly expense based on selection of values from calculated table created and named as year division 
+
+   monthly expense = var select_month = SELECTEDVALUE('year division'[month yr])
+   return
+   CALCULATE([Total expense], finance[month yr] = select_month)
+------------------------------------
+
+## Using same above concept to take out monthly Income
+
+   Monthly Income = var date_selected = SELECTEDVALUE('year division'[month yr])
+
+   return CALCULATE([Total value], finance[month yr] =  date_selected)
+------------------------------------
+
+## using same concept to get the value for monthly savings
+
+   Monthly Savings = var month_selection = SELECTEDVALUE('year division'[month yr])
+   return
+   CALCULATE([Total savings], finance[month yr] = month_selection)
+------------------------------------
+
+## calculate savings
+
+  savings = DIVIDE([Total savings], [Total Income],0)
+------------------------------------
+
+## To check the target 
+
+   Target = CALCULATE(SUM(finance[Value]), finance[Type] = "Target")
+------------------------------------
+
+## Total Revenue 
+
+    Total expense = CALCULATE([Total value], finance[Type] = "Expense")
+------------------------------------
+
+## Total Income
+
+   Total Income = CALCULATE([Total value], finance[Type] = "Income")
+------------------------------------
+
+## Total savings 
+
+   Total savings = CALCULATE([Total value], finance[Type] = "savings")
+------------------------------------
+
+
+## Total Value
+
+  Total value = SUM(finance[Value])
+------------------------------------
+
+## calculated column named as year division
+
+   year division = SUMMARIZE(finance, finance[Date], finance[month yr], finance[year])
+
+========================================
